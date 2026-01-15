@@ -142,10 +142,7 @@ def parse_eval_response(raw_output: str) -> Dict[str, Any]:
     Parse the evaluation response from the model.
     """
     try:
-        # 第一步：清理可能存在的 ```json ... ``` 包裹
         cleaned = clean_json_string(raw_output)
-
-        # 第二步：尝试解析为 JSON
         result = json.loads(cleaned)
         return result
     except json.JSONDecodeError as e:
@@ -585,7 +582,6 @@ def load_ground_truth_list(json_path):
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        # 确保数据是列表
         if isinstance(data, list):
             return data
         else:
