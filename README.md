@@ -73,6 +73,11 @@ Summary: `{model}_{date}_all.json`
 
 Any model with OpenAI-compatible API (OpenAI, OpenRouter, Anthropic, Google Gemini, etc.)
 
+
+## Download Kaggle Dataset
+
+Use dataset_download.py to download the needed datasets from kaggle.
+
 ## Dataset Format
 
 ```json
