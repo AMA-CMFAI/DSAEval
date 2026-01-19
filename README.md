@@ -147,18 +147,26 @@ Any model that exposes an **OpenAI-compatible `/chat/completions`** endpoint wor
 
 Add `--is_multimodal` for vision-capable models.
 
-## Citation
+[//]: # (## Citation)
 
-If you use DSAEval in your research, please consider citing the project:
+[//]: # ()
+[//]: # (If you use DSAEval in your research, please consider citing the project:)
 
-```bibtex
-@misc{dsaeval2025,
-  title  = {DSAEval: Evaluating Data Science Agents on Real-World Problems},
-  author = {AMA-CMFAI},
-  year   = {2025},
-  url    = {https://github.com/AMA-CMFAI/DSAEval}
-}
-```
+[//]: # (```bibtex)
+
+[//]: # (@misc{dsaeval2025,)
+
+[//]: # (  title  = {DSAEval: Evaluating Data Science Agents on Real-World Problems},)
+
+[//]: # (  author = {AMA-CMFAI},)
+
+[//]: # (  year   = {2025},)
+
+[//]: # (  url    = {https://github.com/AMA-CMFAI/DSAEval})
+
+[//]: # (})
+
+[//]: # (```)
 
 ---
 
