@@ -1,92 +1,167 @@
-# DSAEval
+<div align="center">
+  <img src="figures/dsa_eval.png" alt="DSAEval Logo"/><br><br>
+  <h1>DSAEval</h1>
+  
+  <br>
 
-Evaluating Data Science Agents on a Wide Range of Real-World Data Science Problems.
+  <a href="https://github.com/AMA-CMFAI/DSAEval">
+    <img src="https://img.shields.io/badge/GitHub-DSAEval-181717?logo=github&logoColor=white" alt="GitHub">
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://dsaeval.github.io/DSAEval/">
+    <img src="https://img.shields.io/badge/🌐-Official%20Homepage-0078d4" alt="Homepage">
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://dsaeval.lambda.org.ai/">
+    <img src="https://img.shields.io/badge/👀-Live%20Agent%20Viewer-purple" alt="Live Viewer">
+  </a>
+  &nbsp;&nbsp;
+  <img src="https://img.shields.io/badge/python-3.10-blue?logo=python&logoColor=white" alt="Python">
+</div>
 
-## Installation
+**Evaluating Data Science Agents on Real-World, Open-Ended Problems**
+
+DSAEval is a challenging benchmark for evaluating **LLM-powered data science agents** across **641 real-world problems** drawn from **285 diverse datasets** (tabular, image, text).  
+It focuses on:
+
+- Fully open-ended tasks  
+- Multimodal understanding  
+- Iterative multi-turn tool usage & reasoning  
+- Multi-dimensional scoring (reasoning quality + code correctness + final result fidelity)
+
+→ [Official Website](https://dsaeval.github.io/DSAEval/)  
+→ [Live Agent Runs & Viewer](https://dsaeval.lambda.org.ai/) (browse conversations, generated figures, reports)
+
+## Quick Start
+
+### 1. Clone & Install
 
 ```bash
-# Create virtual environment
-python -m venv dsaeval_env
-source dsaeval_env/bin/activate  # Linux/Mac
-# dsaeval_env\Scripts\activate  # Windows
+git clone https://github.com/AMA-CMFAI/DSAEval.git
+cd DSAEval
+```
+
+```bash
+# Recommended: use conda
+conda create -n dsaeval python=3.10 -y
+conda activate dsaeval
 
 # Install dependencies
 pip install -r requirements.txt
-
-# Install Jupyter kernel
-pip install ipykernel
-python -m ipykernel install --user --name dsa_eval --display-name "Python (DSA Eval)"
 ```
 
-## Usage
+### 2. Register Jupyter Kernel (recommended)
 
-### Basic Command
+Makes it easier to open and debug the generated `.ipynb` files:
+
+```bash
+pip install ipykernel
+python -m ipykernel install --user --name dsaeval --display-name "DSAEval (3.10)"
+```
+
+### 3. Download Datasets
+
+```bash
+# Download the raw datasets
+python dataset_download.py
+```
+
+Download the **soft ground-truth figures** from Google Drive:
+
+🔗 [Figures – Google Drive](https://drive.google.com/file/d/1RJ--0uYTEIY4MO3A1CyFMvMNoaKLTD0U/view?usp=drive_link)
+
+After downloading:
+1. Unzip the file
+2. Move the extracted folder into the project root (next to `dataset_download.py`)
+
+## Running Evaluations
+
+You need access to an **OpenAI-compatible** chat completions API (OpenRouter, Anthropic, OpenAI, Grok, Gemini, etc.).
+
+Example command:
 
 ```bash
 python runner.py \
-    --model "anthropic/claude-sonnet-4-20250514" \
-    --api_key "your-api-key" \
+    --model "anthropic/claude-sonnet-4.5" \
+    --api_key "sk-......your-key......" \
     --base_url "https://openrouter.ai/api/v1" \
-    --qra_path "./dsaeval_small.json" \
-    --log_path "./logs" \
-    --session_path "./sessions"
+    --qra_path "./dsaeval.json" \
+    --log_path "./agent_logs" \
+    --session_path "./agent_sessions"
 ```
 
-### Arguments
+### Main CLI Flags
 
-| Argument | Description | Default |
-|----------|-------------|---------|
-| `--model` | Model name | `google/gemini-3-pro` |
-| `--api_key` | API key | `sk-xxx` |
-| `--base_url` | API base URL | `https://openrouter.ai/api/v1` |
-| `--qra_path` | Path to evaluation JSON | Required |
-| `--max_it` | Max iterations | 20 |
-| `--log_path` | Log output directory | `/srv/share/DSA_Eval_logs/` |
-| `--session_path` | Session output directory | `/srv/share/dsa_eval_chat_session` |
-| `--time_out` | Timeout in seconds | 6000 |
-| `--is_multimodal` | Enable multimodal mode | False |
+| Flag              | Description                                      | Example / Default                          |
+|-------------------|--------------------------------------------------|--------------------------------------------|
+| `--model`         | Model name (OpenAI-style)                        | `openai/gpt-4o-mini`                       |
+| `--api_key`       | Your API key                                     | `sk-or-v1-xxxx`                            |
+| `--base_url`      | API base endpoint                                | `https://openrouter.ai/api/v1`             |
+| `--qra_path`      | Path to benchmark JSON                           | `./dsaeval.json`                           |
+| `--max_it`        | Max iterations per task                          | `20`                                       |
+| `--log_path`      | Directory for logs & reports                     | `./agent_logs`                             |
+| `--session_path`  | Directory for sessions (chats, figures, etc.)    | `./agent_sessions`                         |
+| `--time_out`      | Per-step timeout (seconds)                       | `6000`                                     |
+| `--is_multimodal` | Enable multimodal / vision support               | (flag, default off)                        |
 
-### Running Specific Tasks
+Full help:
 
 ```bash
-# By ID range (0-9)
-python runner.py --id_range "0:10" ...
-
-# From specific ID
-python runner.py --id_range "5:" ...
-
-# By JSON file
-echo '[35, 45, 46]' > ids.json
-python runner.py --target_ids_json "ids.json" ...
+python runner.py -h
 ```
 
 ## Output Files
 
-Per task (`{model}_{folder_name}_{id}_*`):
-- `_log.json` - Execution log
-- `_final_report.txt` - Final report
-- `_code.ipynb` - Jupyter notebook
+For each task, a folder is created in `log_path` (named roughly `{model}_{category}_{id}_*`):
 
-Summary: `{model}_{date}_all.json`
+- `_log.json`          — detailed execution trace  
+- `_final_report.txt`  — final judgment & score rationale  
+- `_code.ipynb`        — generated Jupyter notebook
+
+After all tasks finish:
+
+- `{model}_YYYY-MM-DD_all.json` — overall summary & aggregated scores
+
+## Scoring & Leaderboard
+
+After running experiments:
+
+```bash
+python evaluation.py
+```
+
+Then visit:
+
+- 🌐 [Official Leaderboard & Results](https://dsaeval.github.io/DSAEval/)  
+- 👀 [Live Viewer – All Agent Runs](https://dsaeval.lambda.org.ai/) (real-time chats, figures, reports)
 
 ## Supported Models
 
-Any model with OpenAI-compatible API (OpenAI, OpenRouter, Anthropic, Google Gemini, etc.)
+Any model that exposes an **OpenAI-compatible `/chat/completions`** endpoint works, including:
 
+- Anthropic Claude family  
+- OpenAI GPT series  
+- Google Gemini  
+- xAI Grok  
+- Many open models via vLLM, Together, Fireworks, DeepInfra, etc.
 
-## Download Kaggle Dataset
+Add `--is_multimodal` for vision-capable models.
 
-Use dataset_download.py to download the needed datasets from kaggle.
+## Citation
 
-## Dataset Format
+If you use DSAEval in your research, please consider citing the project:
 
-```json
-[
-  {
-    "id": 35,
-    "folder_name": "bloomington-accidents",
-    "dataset105": "/path/to/dataset",
-    "question": "Your task question here..."
-  }
-]
+```bibtex
+@misc{dsaeval2025,
+  title  = {DSAEval: Evaluating Data Science Agents on Real-World Problems},
+  author = {AMA-CMFAI},
+  year   = {2025},
+  url    = {https://github.com/AMA-CMFAI/DSAEval}
+}
+```
+
+---
+
+If you find this benchmark helpful, please consider giving the repo a ⭐!  
+Bug reports, new task suggestions, and pull requests are very welcome.
 ```
