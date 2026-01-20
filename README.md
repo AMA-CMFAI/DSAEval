@@ -30,7 +30,7 @@ It focuses on:
 - Multi-dimensional scoring (reasoning quality + code correctness + final result fidelity)
 
 → [Official Website](https://dsaeval.github.io/DSAEval/)  
-→ [Live Agent Runs & Viewer](https://dsaeval.lambda.org.ai/) (browse conversations, generated figures, reports)
+→ [Live Agent Runs & Viewer](https://dsaeval.lambda.org.ai/) (browse conversations and reports)
 
 ## Quick Start
 
