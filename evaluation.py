@@ -6,52 +6,19 @@ import logging
 import base64
 import ast
 import nbformat
+import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
 from openai import OpenAI, APIError
 from typing import Dict, Any, Optional
-# =================Configuration=================
 
-# 1. API 设置
-API_KEY = "xxx" # replace by your api Key
-API_BASE = "xxx" # replace by your api base URL,for example: https://api.openai.com/xxx
-EVAL_MODEL_NAME = "xxx" # evaluation model name,forexample anthropic/claude-haiku-4.5
-
-# 2. range settings
-EVAL_START_INDEX = 0        # start index (inclusive)
-EVAL_BATCH_SIZE = None   # end_index = start_index + batch_size; None indicates all remaining
-
-INNER_CONCURRENCY = 10     # model parrallelism per process
-
-# 3. file path settings
-LOGS_ROOT_DIR = "xxx"          # logs path root dir
-GROUND_TRUTH_PATH = "xxx.json" # ground truth JSON file path
-IMAGE_BASE_DIR = "xxx"         # base dir for reference images
-OUTPUT_ROOT_DIR = "xxx"        # output dir for evaluation results
-
-# 4. model list
-
-TARGET_MODELS = [
-    "deepseek/deepseek-v3.2",
-    "deepseek/deepseek-v3.2-exp",
-    "google/gemini-3-pro",
-    "minimax/minimax-m2",
-    "mistralai/ministral-14b-2512",
-    "mimo-v2-flash",
-    "x-ai/grok-4.1-fast",
-    "z-ai/glm-4.6v",
-    "qwen/qwen3-vl-30b-a3b-thinking",
-    "openai/gpt-oss-120b",
-    "openai/gpt-5.2",
-    "openai/gpt-5-nano" 
-]
-
-# =========================================
-
+# Set up logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
 def encode_image(image_path):
+    """
+    Encodes an image file to a base64 string.
+    """
     if not os.path.exists(image_path):
         return None
     try:
@@ -60,7 +27,11 @@ def encode_image(image_path):
     except Exception:
         return None
 
-def extract_reference_images(item):
+def extract_reference_images(item, image_base_dir):
+    """
+    Extracts reference images based on the image_id in the figure string.
+    Now accepts image_base_dir as an argument.
+    """
     figure_str = item.get("figure")
     if not figure_str or not isinstance(figure_str, str):
         return []
@@ -74,9 +45,10 @@ def extract_reference_images(item):
     
     encoded_images = []
     for img_id in image_ids:
-        img_path = os.path.join(IMAGE_BASE_DIR, folder_name, f"{img_id}.png")
+        # Construct path using the passed directory argument
+        img_path = os.path.join(image_base_dir, folder_name, f"{img_id}.png")
         if not os.path.exists(img_path):
-             img_path = os.path.join(IMAGE_BASE_DIR, folder_name, f"{img_id}.svg")
+             img_path = os.path.join(image_base_dir, folder_name, f"{img_id}.svg")
         
         if os.path.exists(img_path):
             base64_img = encode_image(img_path)
@@ -85,6 +57,9 @@ def extract_reference_images(item):
     return encoded_images
 
 def extract_predicted_images(pred_text):
+    """
+    Parses the predicted text to find generated image paths and encodes them.
+    """
     delimiter = "==========[Finished, Generated Files]=========="
     if delimiter not in pred_text:
         return pred_text.strip(), []
@@ -110,6 +85,7 @@ def extract_predicted_images(pred_text):
         if not path: continue
         if not path.lower().endswith(valid_img_exts): continue
 
+        # Handle path remapping if necessary (docker path vs host path)
         old_prefix = "/tmp/chat_session"
         new_prefix = "/srv/share/dsa_eval_chat_session"
         if path.startswith(old_prefix):
@@ -124,13 +100,18 @@ def extract_predicted_images(pred_text):
     return text_content, encoded_images
 
 def extract_id_from_filename(filename):
-    
+    """
+    Extracts the numeric ID from the report filename.
+    """
     match = re.search(r'_(\d+)_final_report\.txt$', filename)
     if match:
         return int(match.group(1))
     return None
 
 def clean_json_string(s: str) -> str:
+    """
+    Cleans markdown code blocks from a JSON string.
+    """
     pattern = r'```json\s*(\s*[\S\s]*?)\s*```'
     match = re.search(pattern, s, flags=re.DOTALL)
     if match:
@@ -160,13 +141,10 @@ def parse_eval_response(raw_output: str) -> Dict[str, Any]:
             "exception": str(e)
         }
 
-
-
-import json
-import nbformat
-import logging
-
 def notebook_to_eval_inputs(notebook_path: str):
+    """
+    Reads a notebook file and extracts code implementation details for evaluation.
+    """
     try:
         with open(notebook_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -231,13 +209,14 @@ def notebook_to_eval_inputs(notebook_path: str):
         # logging.error(f"Error parsing notebook: {e}")
         return None, 0.0, False
 
-
 # -----------------------------
 # Evaluation Prompt
 # -----------------------------
 def evaluate_answer_multimodal(problem, standard_answer, predicted_code, predicted_reasoning_answer, 
                                ref_images, pred_images, client, model):
-    
+    """
+    Sends the gathered data to the LLM for evaluation.
+    """
     EVAL_PROMPT = """You are a data science evaluation assistant. Your task is to objectively evaluate the quality of a generated solution for the given [PROBLEM].
 
 ### Evaluation Principles:
@@ -396,10 +375,10 @@ Return **only** the following JSON, without any additional text or code
     return json.dumps({"error": "API Call Failed", "last_error": last_error})
 
 
-
-def process_single_task(gt_item, report_path, code_path, client, safe_model_name):
+def process_single_task(gt_item, report_path, code_path, client, safe_model_name, args):
     """
-    process a single task given ground truth item, report path, and code path
+    Process a single task given ground truth item, report path, and code path.
+    Note: 'args' are now passed in to access configurations.
     """
     try:
         q_id = gt_item.get('id')
@@ -449,7 +428,8 @@ def process_single_task(gt_item, report_path, code_path, client, safe_model_name
         std_full = f"Reasoning:\n{gt_item.get('reasoning', '')}\n\nAnswer:\n{gt_item.get('answer', '')}"
         
         # scrape reference images
-        ref_imgs = extract_reference_images(gt_item)
+        # Pass the image_dir from args
+        ref_imgs = extract_reference_images(gt_item, args.image_dir)
 
         # 4. evaluate 
         eval_raw = evaluate_answer_multimodal(
@@ -460,7 +440,7 @@ def process_single_task(gt_item, report_path, code_path, client, safe_model_name
             ref_images=ref_imgs,
             pred_images=pred_imgs,                    
             client=client,
-            model=EVAL_MODEL_NAME
+            model=args.eval_model  # Use the model defined in args
         )
         
         try:
@@ -490,28 +470,28 @@ def process_single_task(gt_item, report_path, code_path, client, safe_model_name
         logging.error(f"Error processing task ID {gt_item.get('id')}: {e}")
         return None
 
-
-
-def process_model_directory_by_gt(model_rel_path, target_gt_items):
-  
-    input_base_dir = os.path.join(LOGS_ROOT_DIR, model_rel_path)
+def process_model_directory_by_gt(model_rel_path, target_gt_items, args):
+    """
+    Scans a model's directory and processes tasks. 
+    Configuration is accessed via 'args'.
+    """
+    input_base_dir = os.path.join(args.logs_dir, model_rel_path)
     safe_model_name = model_rel_path.replace("/", "_")
-    output_dir = os.path.join(OUTPUT_ROOT_DIR, safe_model_name)
+    output_dir = os.path.join(args.output_dir, safe_model_name)
     
     if not os.path.exists(input_base_dir):
         return f"{safe_model_name}: Dir not found: {input_base_dir}"
     
     os.makedirs(output_dir, exist_ok=True)
     
-    end_index = EVAL_START_INDEX + len(target_gt_items)
-    output_filename = f"evaluation_summary_{EVAL_START_INDEX}_{end_index}.json"
+    end_index = args.start_index + len(target_gt_items)
+    output_filename = f"evaluation_summary_{args.start_index}_{end_index}.json"
     output_file_path = os.path.join(output_dir, output_filename)
 
     # initialize Client
-    client = OpenAI(api_key=API_KEY, base_url=API_BASE)
+    client = OpenAI(api_key=args.api_key, base_url=args.base_url)
 
     # 1. construct id to file mapping
-    
     id_to_file_pair = {} # {id: (report_path, code_path)}
     logging.info(f"[{safe_model_name}] Scanning directory recursively: {input_base_dir}")
     
@@ -544,8 +524,9 @@ def process_model_directory_by_gt(model_rel_path, target_gt_items):
 
     results = []
     
-    # 2. macth & process
-    with ThreadPoolExecutor(max_workers=INNER_CONCURRENCY) as executor:
+    # 2. match & process
+    # Use concurrency from args
+    with ThreadPoolExecutor(max_workers=args.concurrency) as executor:
         futures = {}
         for gt_item in target_gt_items:
             q_id = gt_item.get('id')
@@ -553,7 +534,8 @@ def process_model_directory_by_gt(model_rel_path, target_gt_items):
             if q_id in id_to_file_pair:
                 report_path, code_path = id_to_file_pair[q_id] 
                 # file_path = id_to_file_path[q_id]
-                fut = executor.submit(process_single_task, gt_item, report_path, code_path, client, safe_model_name)
+                # Pass 'args' to the worker function
+                fut = executor.submit(process_single_task, gt_item, report_path, code_path, client, safe_model_name, args)
                 futures[fut] = q_id
         
         if not futures:
@@ -591,9 +573,15 @@ def load_ground_truth_list(json_path):
         logging.error(f"load_ground_truth_list failed: {e}")
         return []
 
-def main():
+def main(args):
+    """
+    Main logic utilizing arguments passed from the parser.
+    """
+    # Parse target models if provided in CLI, otherwise use the default string from parser
+    target_models_list = [m.strip() for m in args.target_models.split(',') if m.strip()]
+
     # load full ground truth list
-    full_gt_list = load_ground_truth_list(GROUND_TRUTH_PATH)
+    full_gt_list = load_ground_truth_list(args.ground_truth)
     if not full_gt_list: 
         print("Error: No ground truth data found.")
         return
@@ -602,11 +590,11 @@ def main():
     print(f"Total Ground Truth Items: {total_items}")
 
     # slice the target GT items based on start index and batch size
-    start = EVAL_START_INDEX
-    if EVAL_BATCH_SIZE is None:
+    start = args.start_index
+    if args.batch_size is None:
         end = total_items
     else:
-        end = min(start + EVAL_BATCH_SIZE, total_items)
+        end = min(start + args.batch_size, total_items)
 
     if start >= total_items:
         print(f"Start index {start} is out of bounds (Total: {total_items}). Exiting.")
@@ -614,17 +602,118 @@ def main():
 
     target_gt_items = full_gt_list[start:end]
     print(f"Target Evaluation Range: Index {start} to {end} (Count: {len(target_gt_items)})")
+    
     preview_ids = [item.get('id') for item in target_gt_items[:5]]
     print(f"Preview IDs in this batch: {preview_ids} ...")
-    with ThreadPoolExecutor(max_workers=min(100, len(TARGET_MODELS))) as executor:
+    
+    with ThreadPoolExecutor(max_workers=min(100, len(target_models_list))) as executor:
         futures = []
-        for model_rel_path in TARGET_MODELS:
-
-            future = executor.submit(process_model_directory_by_gt, model_rel_path, target_gt_items)
+        for model_rel_path in target_models_list:
+            # Pass 'args' down to the processing function
+            future = executor.submit(process_model_directory_by_gt, model_rel_path, target_gt_items, args)
             futures.append(future)
         
         for future in as_completed(futures):
             print(future.result())
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="Run evaluation for data science agent outputs"
+    )
+
+    # 1. API Configuration
+    parser.add_argument(
+        "--api_key",
+        type=str,
+        default="xxx",
+        help="API key for authentication"
+    )
+
+    parser.add_argument(
+        "--base_url",
+        type=str,
+        default="xxx",
+        help="Base URL for the model API"
+    )
+
+    parser.add_argument(
+        "--eval_model",
+        type=str,
+        default="anthropic/claude-haiku-4.5",
+        help="Model name used for evaluation"
+    )
+
+    parser.add_argument(
+        "--start_index",
+        type=int,
+        default=0,
+        help="Start index for evaluation"
+    )
+
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=None,
+        help="Number of items to evaluate. If not set, runs until end."
+    )
+
+    parser.add_argument(
+        "--concurrency",
+        type=int,
+        default=10,
+        help="Model parallelism per process"
+    )
+
+    # 3. File Paths
+    parser.add_argument(
+        "--logs_dir",
+        type=str,
+        default="xxx",
+        help="Root directory where agent logs are stored"
+    )
+
+    parser.add_argument(
+        "--ground_truth",
+        type=str,
+        default="xxx.json",
+        help="Path to the ground truth JSON file"
+    )
+
+    parser.add_argument(
+        "--image_dir",
+        type=str,
+        default="xxx",
+        help="Base directory for reference images"
+    )
+
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        default="xxx",
+        help="Directory to save evaluation results"
+    )
+
+    
+    DEFAULT_TARGET_MODELS_LIST = [
+        "deepseek/deepseek-v3.2",
+        "google/gemini-3-pro",
+        "minimax/minimax-m2",
+        "mistralai/ministral-14b-2512",
+        "mimo-v2-flash",
+        "x-ai/grok-4.1-fast",
+        "z-ai/glm-4.6v",
+        "qwen/qwen3-vl-30b-a3b-thinking",
+        "openai/gpt-5.2",
+        "openai/gpt-5-nano" 
+    ]
+    
+    parser.add_argument(
+        "--target_models",
+        type=str,
+        default=",".join(DEFAULT_TARGET_MODELS_LIST),
+        help="Comma-separated list of model paths to evaluate."
+    )
+
+    args = parser.parse_args()
+    print("Arguments:", args)
+    main(args)
