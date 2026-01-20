@@ -154,11 +154,6 @@ python evaluation.py \
 | `--image_dir`      | Base directory for reference images              | `./images`                                 |
 | `--output_dir`     | Directory to save evaluation results             | `./eval_results`
 
-Then visit:
-
-- 🌐 [Official Leaderboard & Results](https://dsaeval.github.io/DSAEval/)  
-- 👀 [Live Viewer – All Agent Runs](https://dsaeval.lambda.org.ai/) (real-time chats, figures, reports)
-
 ## Supported Models
 
 Any model that exposes an **OpenAI-compatible `/chat/completions`** endpoint works, including:
