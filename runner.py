@@ -82,7 +82,7 @@ def run_workflow(args):
             if target_start not in group_ids:
                 continue
 
-        dataset_path = dataset_group[0].get("dataset105")
+        dataset_path = dataset_group[0].get("dataset")
         folder_name = dataset_group[0]["folder_name"]
 
         cache = Cache()
@@ -214,7 +214,7 @@ if __name__ == "__main__":
         "--model",
         type=str,
         default="google/gemini-3-pro",
-        help="Model name to run the agent with (default: openai/gpt-5-nano)"
+        help="Model name to run the agent with (default: google/gemini-3-pro)"
     )
 
     parser.add_argument(
@@ -234,8 +234,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--qra_path",
         type=str,
-        default="/srv/share/dsaeval_small.json",
-        help="Path to the QRA json file for evaluation (default: /srv/share/dsaeval_small.json)"
+        default="/srv/share/dsaeval.json",
+        help="Path to Tasks JSON (dsaeval.json)"
     )
 
 
@@ -249,15 +249,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "--log_path",
         type=str,
-        default="/srv/share/DSA_Eval_logs/",
-        help="Path to the log file (default: /srv/share/agent_logs)"
+        default="./agent_logs",
+        help="Path to the log file (default: agent_logs)"
     )
 
     parser.add_argument(
         "--session_path",
         type=str,
-        default="/srv/share/dsa_eval_chat_session",
-        help="Session path of chat (mounted with docker), figures, models that be saved. (default: /srv/share/dsa_eval_chat_session)"
+        default="./agent_sessions",
+        help="Session path of chat, figures, models that be saved. /agent_sessions"
     )
 
     parser.add_argument(
