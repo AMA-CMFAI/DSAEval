@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="figures/dsa_eval.png" alt="DSAEval Logo"/><br><br>
+  <img src="figures/dsaeval.png" alt="DSAEval Logo"/><br><br>
   <h1>DSAEval</h1>
   
   <br>
