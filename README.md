@@ -152,13 +152,7 @@ python evaluation.py \
 | `--logs_dir`       | Root directory where agent logs are stored       | `./agent_logs`                             |
 | `--ground_truth`   | Path to the ground truth JSON file               | `./ground_truth.json`                      |
 | `--image_dir`      | Base directory for reference images              | `./images`                                 |
-| `--output_dir`     | Directory to save evaluation results             | `./eval_results`   
-
-Full help:
-
-```bash
-python evaluation.py -h
-```
+| `--output_dir`     | Directory to save evaluation results             | `./eval_results`
 
 Then visit:
 
@@ -202,4 +196,3 @@ Add `--is_multimodal` for vision-capable models.
 
 If you find this benchmark helpful, please consider giving the repo a ⭐!  
 Bug reports, new task suggestions, and pull requests are very welcome.
-```
