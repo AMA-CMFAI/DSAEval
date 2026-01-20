@@ -124,10 +124,40 @@ After all tasks finish:
 
 ## Scoring & Leaderboard
 
-After running experiments:
+After running experiments, you need execute evaluation.py.
+
+Example command:
 
 ```bash
-python evaluation.py
+python evaluation.py \
+  --api_key "sk-......your-key......" \
+  --base_url "https://api.your-provider.com/v1" \
+  --eval_model "anthropic/claude-haiku-4.5" \
+  --logs_dir "./agent_logs" \
+  --ground_truth "./data/ground_truth.json" \
+  --output_dir "./evaluation_results" \
+  --concurrency 10
+```
+### Main CLI Flags
+
+| Flag               | Description                                      | Example / Default                          |
+|--------------------|--------------------------------------------------|--------------------------------------------|
+| `--api_key`        | API key for authentication                       | `sk-xxxx-xxxx`                             |
+| `--base_url`       | Base URL for the model API                       | `https://openrouter.ai/api/v1`             |
+| `--eval_model`     | Model name used for evaluation                   | `anthropic/claude-haiku-4.5`               |
+| `--target_models`  | Comma-separated list of model paths to evaluate  | ["deepseek-v3.2","gemini-3-pro",...]       |
+| `--start_index`    | Start index for evaluation                       | `0`                                        |
+| `--batch_size`     | Number of items to evaluate                      | `None` (Runs until end)                    |
+| `--concurrency`    | Model parallelism per process                    | `10`                                       |
+| `--logs_dir`       | Root directory where agent logs are stored       | `./agent_logs`                             |
+| `--ground_truth`   | Path to the ground truth JSON file               | `./ground_truth.json`                      |
+| `--image_dir`      | Base directory for reference images              | `./images`                                 |
+| `--output_dir`     | Directory to save evaluation results             | `./eval_results`   
+
+Full help:
+
+```bash
+python evaluation.py -h
 ```
 
 Then visit:
