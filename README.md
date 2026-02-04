@@ -56,7 +56,7 @@ Makes it easier to open and debug the generated `.ipynb` files:
 
 ```bash
 pip install ipykernel
-python -m ipykernel install --user --name dsaeval --display-name "DSAEval (3.10)"
+python -m ipykernel install --user --name dsa_eval --display-name "DSAEval (3.10)"
 ```
 
 ### 3. Download Datasets
