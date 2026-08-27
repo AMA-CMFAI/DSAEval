@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description"
+          content="DSAEval: Evaluate Data Science Agent By Large Scale Real World Data Science Problems.">
+    <meta name="keywords" content="Data Science, LLM, Agent, Benchmark, DSAEval, Multimodal">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DSAEval: Evaluate Data Science Agent By Large Scale Real World Data Science Problems</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+    <style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            background-color: #fafaFA;
+        }
+
+        .hero-body {
+            padding-bottom: 2rem;
+        }
+
+
+        .title.is-1 {
+            font-family: 'Google Sans', sans-serif;
+            font-weight: 700;
+            font-size: 2.5rem;
+        }
+
+        .section-title {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .link-block {
+            margin: 0 6px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #4a4a4a;
+        }
+
+        .author-block {
+            font-size: 1.2rem;
+            margin-right: 15px;
+        }
+
+        .institution-block {
+            font-size: 1rem;
+            color: #666;
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* Box Styles */
+        .abstract-box {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: justify;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
+        }
+
+        .custom-table th, .custom-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        .custom-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .custom-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .best-score {
+            font-weight: bold;
+            color: #d32f2f;
+        }
+
+        .second-score {
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        .gain-positive {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        /* Image Styles */
+        .teaser-img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+        }
+
+        .caption {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin-top: 5px;
+            margin-bottom: 20px;
+        }
+
+        /* Code Block */
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<section class="hero">
+    <div class="hero-body">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered">
+                <div class="column has-text-centered">
+                    <h1 class="title is-1 publication-title">DSAEval: Evaluating Data Science Agents on a Wide Range of
+                        Real-World Data Science Problems
+                    </h1>
+
+                    <div class="column has-text-centered publication-links">
+<!--                        <span class="link-block">-->
+<!--                          <a href="#" class="button is-dark is-rounded is-outlined">-->
+<!--                            <span class="icon"><i class="fas fa-file-pdf"></i></span>-->
+<!--                            <span>Paper</span>-->
+<!--                          </a>-->
+<!--                        </span>-->
+
+                        <span class="link-block">
+                          <a href="https://dsaeval.lambda.org.ai/" class="button is-dark is-rounded is-outlined">
+                            <span class="icon"><i class="fas fa-file-alt"></i></span>
+                            <span>Task Logs</span>
+                          </a>
+                        </span>
+
+                        <span class="link-block">
+                          <a href="https://anonymous.4open.science/r/DSAEval-B39C/" class="button is-dark is-rounded is-outlined">
+                            <span class="icon"><i class="fab fa-github"></i></span>
+                            <span>Code</span>
+                          </a>
+                        </span>
+
+                        <span class="link-block">
+                          <a href="https://anonymous.4open.science/r/DSAEval-B39C/dsaeval.json"
+                             class="button is-dark is-rounded is-outlined">
+                            <span class="icon"><i class="fas fa-database"></i></span>
+                            <span>Data</span>
+                          </a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div style="text-align: center">
+        <iframe
+                src="https://dsaeval.lambda.org.ai/"
+                width="80%"
+                height="800px"
+                style="border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
+                title="DSAEval Agent Logs Viewer"
+                allowfullscreen
+                loading="lazy"
+        ></iframe>
+
+        <!-- 可選：加一個說明 -->
+        <p class="has-text-centered" style="margin: 1rem 0; color: #666;">
+            Above is the live view of all agent task logs and reports. Select a chat file to explore details.
+        </p>
+        <p class="has-text-centered" style="margin: 0.5rem 0; color: red; font-weight: bold;">
+            ⚠️ Loading 7000+ tasks may take around 20+ seconds. Please wait a moment...
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+            <div class="column is-four-fifths">
+                <h2 class="section-title">Abstract</h2>
+                <div class="abstract-box">
+                    Recent LLM-based data agents aim to automate data science tasks ranging from data analysis to deep learning. However, the open-ended nature of real-world data science problems, which often span multiple taxonomies and lack standard answers, poses a significant challenge for evaluation. To address this issue, we introduce DSAEval, a benchmark consisting of 641 real-world data science problems grounded in 285 diverse datasets, covering both structured and unstructured modalities such as images and text. DSAEval includes three key features: (1) Multi-modal Environment Perception, enabling agents to interpret observations from both textual and visual modalities; (2) Multi-Query Interactions, reflecting the iterative and cumulative workflow of real-world data science projects; and (3) Multi-Dimensional Evaluation, providing comprehensive assessment across reasoning processes, code generation, and final analytical results. We systematically evaluate 13 advanced agentic LLMs on DSAEval. Experimental results show that Claude-Sonnet-4.5 achieves the strongest overall performance, while MiMo-V2-Pro and GPT-5.2 demonstrate the highest efficiency in execution duration and reasoning steps, respectively. In addition, MiMo-V2-Flash emerges as the most cost-effective model. We further show that multimodal perception consistently enhances performance on vision-related tasks, with improvements ranging from 2.04% to 11.30%. Overall, although current data science agents perform strongly on structured data and routine analytical workflows, substantial challenges remain in unstructured domains. Finally, we discuss critical insights and outline future research directions for autonomous data science agents.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container is-max-desktop">
+        <h2 class="section-title">Benchmark Statistics</h2>
+        <div class="columns is-centered">
+            <div class="column is-full has-text-centered">
+                <img src="dataset_distribution_summary.svg" alt="Dataset Distribution" class="teaser-img">
+                <p class="caption">
+                    <strong>Figure 2: Distribution of DSAEval Benchmark.</strong>
+                    Covering diverse Data Types (Left), Domains (Center), and Task Types (Right).
+                </p>
+            </div>
+        </div>
+
+        <div class="columns is-centered">
+            <div class="column is-20">
+                <h3 class="title is-5 has-text-centered">Comparison with Existing Benchmarks</h3>
+                <div class="table-container">
+                    <table class="table is-hoverable is-fullwidth custom-table" style="text-align: center;">
+                        <thead>
+                        <tr>
+                            <th style="text-align: left;">Benchmark</th>
+                            <th>DataSets</th>
+                            <th>Questions</th>
+                            <th>Hetero. Data</th>
+                            <th>Vision-modal Obs</th>
+                            <th>Multi-step</th>
+                            <th>Deep Learning</th>
+                            <th>Eval. Format</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="text-align: left;">DS-1000</td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td>1,000</td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td>Close (CUT)</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">Infiagent-DABench</td>
+                            <td>52</td>
+                            <td>257</td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td>Close (EM)</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">DA-Code</td>
+                            <td>500</td>
+                            <td>500</td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td>Close (MC)</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">MLAgentBench</td>
+                            <td>13</td>
+                            <td>13</td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td>Close (MC)</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">MLE-Bench</td>
+                            <td>75</td>
+                            <td>75</td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td>Close (MC)</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">DSEval</td>
+                            <td>294</td>
+                            <td>825</td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td>Close (EM)</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">DSCodeBench</td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td>1,000</td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td>Close (CUT)</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">DSBench</td>
+                            <td>112</td>
+                            <td>540</td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td>Close (MCQ, MC)</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left;">DABstep</td>
+                            <td>-</td>
+                            <td>450</td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-times" style="color:#c0392b"></i></td>
+                            <td>Close (EM)</td>
+                        </tr>
+                        <tr style="background-color: #e8f5e9; border: 2px solid #2e7d32;">
+                            <td style="text-align: left;"><strong>DSAEval (Ours)</strong></td>
+                            <td><strong>285</strong></td>
+                            <td><strong>641</strong></td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><i class="fas fa-check" style="color:#2e7d32"></i></td>
+                            <td><strong>Open (Reason, Code, Report)</strong></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="caption">
+                    CUT = Code Unit Tests, EM = Exact/Structured Matching Against Ground Truth,
+                    MC = Metric Comparison, MCQ = Multiple Choice Question.
+                </p>
+            </div>
+        </div>
+
+
+    </div>
+</section>
+
+<section class="section">
+    <div class="container is-max-desktop">
+        <h2 class="section-title">🏆 Leaderboard & Overall Performance</h2>
+
+        <div class="columns is-centered">
+            <div class="column is-full has-text-centered">
+                <img src="dsaeval_overall.png" alt="Overall Performance" class="teaser-img">
+                <p class="caption">
+                    <strong>Figure 3: Overall Model Performance.</strong>
+                    Claude-Sonnet-4.5 leads the benchmark.
+                </p>
+            </div>
+        </div>
+
+        <div class="columns is-centered">
+            <div class="column is-10">
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Model</th>
+                            <th>Total Score</th>
+                            <th>Reasoning</th>
+                            <th>Code</th>
+                            <th>Result</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><strong>Claude-sonnet-4.5</strong></td>
+                            <td class="best-score">8.164</td>
+                            <td>8.970</td>
+                            <td>8.590</td>
+                            <td>7.240</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><strong>Mimo-v2-pro</strong></td>
+                            <td class="second-score">7.912</td>
+                            <td>8.350</td>
+                            <td>8.730</td>
+                            <td>6.970</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><strong>GPT-5.2</strong></td>
+                            <td>7.713</td>
+                            <td>8.270</td>
+                            <td>8.400</td>
+                            <td>6.780</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><strong>Minimax-m2.7</strong></td>
+                            <td>7.699</td>
+                            <td>8.200</td>
+                            <td>8.610</td>
+                            <td>6.640</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td><strong>Mimo-v2-flash</strong></td>
+                            <td>7.644</td>
+                            <td>8.140</td>
+                            <td>8.540</td>
+                            <td>6.600</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td><strong>Minimax-m2</strong></td>
+                            <td>7.642</td>
+                            <td>8.100</td>
+                            <td>8.440</td>
+                            <td>6.700</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td><strong>Gemini-3-pro</strong></td>
+                            <td>7.309</td>
+                            <td>7.960</td>
+                            <td>8.310</td>
+                            <td>6.070</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td><strong>Grok-4.1-fast</strong></td>
+                            <td>7.254</td>
+                            <td>7.870</td>
+                            <td>8.070</td>
+                            <td>6.180</td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td><strong>GPT-5-nano</strong></td>
+                            <td>7.069</td>
+                            <td>7.700</td>
+                            <td>7.850</td>
+                            <td>6.010</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td><strong>DeepSeek-v3.2</strong></td>
+                            <td>7.030</td>
+                            <td>7.470</td>
+                            <td>7.830</td>
+                            <td>6.100</td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td><strong>GLM-4.6v</strong></td>
+                            <td>6.874</td>
+                            <td>7.500</td>
+                            <td>7.800</td>
+                            <td>5.710</td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td><strong>Qwen3-VL-30B-A3B-Thinking</strong></td>
+                            <td>5.324</td>
+                            <td>6.560</td>
+                            <td>5.320</td>
+                            <td>4.400</td>
+                        </tr>
+                        <tr>
+                            <td>13</td>
+                            <td><strong>Ministral-14b-2512</strong></td>
+                            <td>5.182</td>
+                            <td>5.880</td>
+                            <td>5.740</td>
+                            <td>4.240</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</section>
+
+<section class="section">
+    <div class="container is-max-desktop">
+        <h2 class="section-title">📊 In-Depth Analysis</h2>
+
+        <div class="columns is-centered">
+            <div class="column is-full has-text-centered">
+                <h3 class="title is-4">Fine-Grained Capabilities</h3>
+                <img src="new_combined_radar_chart.png" alt="Radar Analysis" class="teaser-img">
+                <p class="caption">
+                    <strong>Figure 4: Performance breakdown by Domain (Left) and Task Type (Right).</strong>
+                </p>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="columns is-centered">
+            <div class="column is-full has-text-centered">
+                <h3 class="title is-4">Efficiency & Cost-Effectiveness</h3>
+                <img src="efficiency.png" alt="Efficiency Analysis" class="teaser-img">
+                <p class="caption">
+                    <strong>Figure 5: Efficiency & Cost-Effectiveness</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--<section class="section">-->
+<!--    <div class="container is-max-desktop">-->
+<!--        <h2 class="section-title">🧪 Multimodal Observation vs Single-modal Observation</h2>-->
+<!--        <div class="columns is-centered">-->
+<!--            <div class="column is-10">-->
+<!--                <p class="has-text-centered" style="margin-bottom: 20px;">-->
+<!--                    Comparing agent performance with <strong>Full Multimodal Observations</strong> vs. <strong>Text-Only-->
+<!--                    Baseline</strong>.-->
+<!--                </p>-->
+<!--                <div class="table-container">-->
+<!--                    <table class="custom-table">-->
+<!--                        <thead>-->
+<!--                        <tr>-->
+<!--                            <th rowspan="2">Model</th>-->
+<!--                            <th colspan="2">Total Score</th>-->
+<!--                            <th rowspan="2">Improvement</th>-->
+<!--                        </tr>-->
+<!--                        <tr>-->
+<!--                            <th>Single-Text</th>-->
+<!--                            <th>Multimodal</th>-->
+<!--                        </tr>-->
+<!--                        </thead>-->
+<!--                        <tbody>-->
+<!--                        <tr>-->
+<!--                            <td><strong>MiniMax-M2</strong></td>-->
+<!--                            <td>6.07</td>-->
+<!--                            <td>7.05</td>-->
+<!--                            <td class="gain-positive">+16.10%</td>-->
+<!--                        </tr>-->
+<!--                        &lt;!&ndash;              <tr>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                <td><strong>Qwen3-VL-30B</strong></td>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                <td>5.93</td>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                <td>6.05</td>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                <td class="gain-positive">+2.13%</td>&ndash;&gt;-->
+<!--                        &lt;!&ndash;              </tr>&ndash;&gt;-->
+<!--                        <tr>-->
+<!--                            <td><strong>GLM-4.6V</strong></td>-->
+<!--                            <td>5.50</td>-->
+<!--                            <td>6.21</td>-->
+<!--                            <td class="gain-positive">+12.99%</td>-->
+<!--                        </tr>-->
+<!--                        &lt;!&ndash;              <tr>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                  <td><strong>Grok-4.1-fast</strong></td>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                  <td>7.40</td>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                  <td>7.88</td>&ndash;&gt;-->
+<!--                        &lt;!&ndash;                  <td class="gain-positive">+6.39%</td>&ndash;&gt;-->
+<!--                        &lt;!&ndash;              </tr>&ndash;&gt;-->
+<!--                        </tbody>-->
+<!--                    </table>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</section>-->
+
+<!-- <section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@article{dsaeval2025,
+  title={DSAEval: Evaluate Data Science Agent By Large Scale Real World Data Science Problems},
+  author={First Author and Second Author},
+  journal={arXiv preprint arXiv:25XX.XXXXX},
+  year={2025}
+}</code></pre>
+  </div>
+</section> -->
+
+<!-- <footer class="footer">
+  <div class="content has-text-centered">
+    <p>
+      This website is adapted from <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> source code.
+    </p>
+  </div>
+</footer> -->
+<div style="text-align: center;">
+    <a href="https://info.flagcounter.com/RRTe"><img
+            src="https://s01.flagcounter.com/map/RRTe/size_l/txt_000000/border_CCCCCC/pageviews_1/viewers_1/flags_1/"
+            alt="Flag Counter" border="0"></a>
+</div>
+
+</body>
+</html>
